@@ -1,3 +1,4 @@
+
 import re, string, datetime, operator
 
 ####################################################################################################
@@ -37,7 +38,7 @@ TVTROPOLIS_PARAMS   = ["3i9zvO0c6HSlP7Fz848a0DvzBM0jUWcC", "z/TVTropolis%20Playe
 FEED_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=%s&startIndex=1&endIndex=500&query=hasReleases&query=CustomText|PlayerTag|%s&field=airdate&field=fullTitle&field=author&field=description&field=PID&field=thumbnailURL&field=title&contentCustomField=title&field=ID&field=parent"
 
 FEEDS_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseList?PID=%s&startIndex=1&endIndex=500&query=categoryIDs|%s&query=BitrateEqualOrGreaterThan|400000&query=BitrateLessThan|601000&sortField=airdate&sortDescending=true&field=airdate&field=author&field=description&field=length&field=PID&field=thumbnailURL&field=title&contentCustomField=title"
-    
+
 DIRECT_FEED = "http://release.theplatform.com/content.select?format=SMIL&pid=%s&UserName=Unknown&Embedded=True&TrackBrowser=True&Tracking=True&TrackLocation=True"
 
 ####################################################################################################
@@ -56,6 +57,7 @@ def Start():
 ####################################################################################################
 def MainMenu():
     dir = MediaContainer(viewGroup="List")
+
     dir.Append(Function(DirectoryItem(DiyPage, "diy Network", thumb=R(DIY_ICON), art=R(DIY_ART)), network = DIY_PARAMS))
     dir.Append(Function(DirectoryItem(FoodPage, "Food Network", thumb=R(FOOD_ICON), art=R(FOOD_ART)), network = FOOD_PARAMS))
     dir.Append(Function(DirectoryItem(GlobalPage, "Global TV", thumb=R(GLOBAL_ICON), art=R(GLOBAL_ART)), network = GLOBALTV_PARAMS))
@@ -64,10 +66,12 @@ def MainMenu():
     dir.Append(Function(DirectoryItem(ShowcasePage, "Showcase", thumb=R(SHOWCASE_ICON), art=R(SHOWCASE_ART)), network = SHOWCASE_PARAMS))
     dir.Append(Function(DirectoryItem(HistoryPage, "Slice", thumb=R(SLICE_ICON), art=R(SLICE_ART)), network = SLICE_PARAMS))
     dir.Append(Function(DirectoryItem(TvtropolisPage, "TVTropolis", thumb=R(TVTROPOLIS_ICON), art=R(TVTROPOLIS_ART)), network = TVTROPOLIS_PARAMS))
+
     return dir
     
 ####################################################################################################
 def VideoPlayer(sender, pid):
+
     videosmil = HTTP.Request(DIRECT_FEED % pid).content
     player = videosmil.split("ref src")
     player = player[2].split('"')
@@ -90,16 +94,19 @@ def VideoPlayer(sender, pid):
             clip = player.split("/video/")
             player = player.split("/video/")[0]
             clip = "/video/" + clip[-1]
+
     #Log(player)
     #Log(clip)
     return Redirect(RTMPVideoItem(player, clip))
     
 ####################################################################################################
 def VideosPage(sender, pid, id):
+
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="InfoList", art=sender.art)
     pageUrl = FEEDS_LIST % (pid, id)
     feeds = JSON.ObjectFromURL(pageUrl)
     #Log(feeds)
+
     for item in feeds['items']:
         title = item['title']
         pid = item['PID']
@@ -111,6 +118,7 @@ def VideosPage(sender, pid, id):
         dir.Append(Function(VideoItem(VideoPlayer, title=title, subtitle=subtitle, summary=summary, thumb=thumb, duration=duration), pid=pid))
     
     dir.Sort('title')
+    
     return dir
     
 #def ClipsPage(sender, showname):
@@ -120,9 +128,11 @@ def VideosPage(sender, pid, id):
     #return dir
 ####################################################################################################
 def FoodPage(sender, network):
+
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
     content = RSS.FeedFromURL("http://www.foodnetwork.ca/2086977.atom")
     #Log(content)
+
     for item in content['entries']:
         title = item['title']
         id = item['link'].split('=')[1]
@@ -131,7 +141,9 @@ def FoodPage(sender, network):
 
 ####################################################################################################
 def GlobalPage(sender, network):
+
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
+
     content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
     for item in content['items']:
         if item['title'] == "Full Episodes":
@@ -145,6 +157,7 @@ def GlobalPage(sender, network):
 
 def HGTVPage(sender, network):
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
+
     content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
     for item in content['items']:
         if "Full Episodes" in item['parent']:
@@ -156,6 +169,7 @@ def HGTVPage(sender, network):
     
 ####################################################################################################
 def HistoryPage(sender, network):
+
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
     content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
     showList = {}
@@ -305,51 +319,4 @@ def SeasonsPage(sender, network):
     return dir
             
 ####################################################################################################
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
