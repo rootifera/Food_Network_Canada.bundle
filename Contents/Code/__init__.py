@@ -37,8 +37,7 @@ def MainMenu():
     dir = MediaContainer(viewGroup="List")
     
     network = FOOD_PARAMS
-    
-    dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
+
     content = RSS.FeedFromURL("http://www.foodnetwork.ca/2086977.atom")
     #Log(content)
 
