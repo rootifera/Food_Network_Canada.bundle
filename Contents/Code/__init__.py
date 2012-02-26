@@ -13,7 +13,7 @@ ICON            = 'icon-default.png'
 FOOD_PARAMS         = ["6yC6lGVHaVA8oWSm1F9PaIYc9tOTzDqY", "z/FOODNET%20Player%20-%20Video%20Centre"]
 
 FEED_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=%s&startIndex=1&endIndex=500&query=hasReleases&query=CustomText|PlayerTag|%s&field=airdate&field=fullTitle&field=author&field=description&field=PID&field=thumbnailURL&field=title&contentCustomField=title&field=ID&field=parent"
-
+#http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?callback=jsonp1330193114953&field=ID&field=depth&field=hasReleases&field=fullTitle&PID=6yC6lGVHaVA8oWSm1F9PaIYc9tOTzDqY&query=CustomText|PlayerTag|z/FOODNET%20Player%20-%20Video%20Centre&field=title&field=fullTitle&field=thumbnailURL&customField=SortCriteria&customField=DisplayTitle
 FEEDS_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseList?PID=%s&startIndex=1&endIndex=500&query=categoryIDs|%s&query=BitrateEqualOrGreaterThan|400000&query=BitrateLessThan|601000&sortField=airdate&sortDescending=true&field=airdate&field=author&field=description&field=length&field=PID&field=thumbnailURL&field=title&contentCustomField=title"
 
 DIRECT_FEED = "http://release.theplatform.com/content.select?format=SMIL&pid=%s&UserName=Unknown&Embedded=True&TrackBrowser=True&Tracking=True&TrackLocation=True"
@@ -34,17 +34,58 @@ def Start():
 ####################################################################################################
 
 def MainMenu():
+    if not Platform.HasFlash:
+        return MessageContainer(NAME, L('This channel requires Flash. Please download and install Adobe Flash on the computer running Plex Media Server.'))
+
     dir = MediaContainer(viewGroup="List")
     
     network = FOOD_PARAMS
+    
+    content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
+    showList = {}
+    showCount = 0
+    items = content['items']
+    items.sort(key=operator.itemgetter('fullTitle'))
+    for item in items:
+        if item['parent'] == '':
+            continue
+        elif "/Web Exclusives/" in item['parent']:
+            Log(item)
+            continue
+        else: pass
+        title = item['parent'].split('/')[-1]
+        if title == "FOODNETVC":
+            continue
+        elif title == 'Food Network Classics':
+            title = item['title']
+        elif title == "TV Shows":
+            title = item['title']
+        elif title == "Most Recent":
+            continue
+        elif title == "Video Blogs":
+            continue
+        elif title == "Video Bites":
+            continue
+        elif title == "Web Exclusives":
+            continue
+        else:
+            pass
+        id = item['ID']
+        thumb = item['thumbnailURL']
 
-    content = RSS.FeedFromURL("http://www.foodnetwork.ca/2086977.atom")
-    #Log(content)
-
-    for item in content['entries']:
-        title = item['title']
-        id = item['link'].split('=')[1]
-        dir.Append(Function(DirectoryItem(VideosPage, title), pid=network[0], id=id))
+        try:
+            if showList[title]:
+                discard = dir.Pop(showList[title]['index'])
+                dir.Append(Function(DirectoryItem(SeasonsPage, title), network=network))
+            else:
+                pass
+        except:
+            showList[title] = {'id':id, 'index':showCount}
+            showCount +=1
+            dir.Append(Function(DirectoryItem(VideosPage, title), pid=network[0], id=id))
+                
+    dir.Sort('title')
+    
     return dir
     
 ####################################################################################################
