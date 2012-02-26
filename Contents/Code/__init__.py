@@ -13,7 +13,7 @@ ICON            = 'icon-default.png'
 FOOD_PARAMS         = ["6yC6lGVHaVA8oWSm1F9PaIYc9tOTzDqY", "z/FOODNET%20Player%20-%20Video%20Centre"]
 
 FEED_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?PID=%s&startIndex=1&endIndex=500&query=hasReleases&query=CustomText|PlayerTag|%s&field=airdate&field=fullTitle&field=author&field=description&field=PID&field=thumbnailURL&field=title&contentCustomField=title&field=ID&field=parent"
-#http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getCategoryList?callback=jsonp1330193114953&field=ID&field=depth&field=hasReleases&field=fullTitle&PID=6yC6lGVHaVA8oWSm1F9PaIYc9tOTzDqY&query=CustomText|PlayerTag|z/FOODNET%20Player%20-%20Video%20Centre&field=title&field=fullTitle&field=thumbnailURL&customField=SortCriteria&customField=DisplayTitle
+
 FEEDS_LIST    = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseList?PID=%s&startIndex=1&endIndex=500&query=categoryIDs|%s&query=BitrateEqualOrGreaterThan|400000&query=BitrateLessThan|601000&sortField=airdate&sortDescending=true&field=airdate&field=author&field=description&field=length&field=PID&field=thumbnailURL&field=title&contentCustomField=title"
 
 DIRECT_FEED = "http://release.theplatform.com/content.select?format=SMIL&pid=%s&UserName=Unknown&Embedded=True&TrackBrowser=True&Tracking=True&TrackLocation=True"
@@ -50,7 +50,6 @@ def MainMenu():
         if item['parent'] == '':
             continue
         elif "/Web Exclusives/" in item['parent']:
-            Log(item)
             continue
         else: pass
         title = item['parent'].split('/')[-1]
@@ -131,7 +130,7 @@ def VideosPage(sender, pid, id):
     for item in feeds['items']:
         title = item['title']
         pid = item['PID']
-        summary =  item['description'].replace('In Full:', '')
+        summary =  String.StripTags(item['description'].replace('In Full:', ''))
         duration = item['length']
         thumb = item['thumbnailURL']
         airdate = int(item['airdate'])/1000
