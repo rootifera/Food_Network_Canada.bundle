@@ -1,7 +1,5 @@
 import datetime, operator
 
-####################################################################################################
-
 NAME = 'FoodNetwork.ca'
 ART = 'art-default.jpg'
 ICON = 'icon-default.png'
@@ -15,8 +13,8 @@ FEEDS_LIST = "http://feeds.theplatform.com/ps/JSON/PortalService/2.2/getReleaseL
 DIRECT_FEED = "http://release.theplatform.com/content.select?format=SMIL&pid=%s&UserName=Unknown&Embedded=True&TrackBrowser=True&Tracking=True&TrackLocation=True"
 
 ####################################################################################################
-
 def Start():
+
     Plugin.AddPrefixHandler("/video/foodnetworkcanada", MainMenu, NAME, ICON, ART)
 
     Plugin.AddViewGroup("InfoList", viewMode="InfoList", mediaType="items")
@@ -29,20 +27,21 @@ def Start():
     HTTP.CacheTime = CACHE_1HOUR
 
 ####################################################################################################
-
 def MainMenu():
+
     if not Platform.HasFlash:
         return MessageContainer(NAME, L('This channel requires Flash. Please download and install Adobe Flash on the computer running Plex Media Server.'))
 
     dir = MediaContainer(viewGroup="List")
-    
+
     network = FOOD_PARAMS
-    
+
     content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
     showList = {}
     showCount = 0
     items = content['items']
     items.sort(key=operator.itemgetter('fullTitle'))
+
     for item in items:
         if item['parent'] == '':
             continue
@@ -50,6 +49,7 @@ def MainMenu():
             continue
         else: pass
         title = item['parent'].split('/')[-1]
+
         if title == "FOODNETVC":
             continue
         elif title == 'Food Network Classics':
@@ -66,6 +66,7 @@ def MainMenu():
             continue
         else:
             pass
+
         id = item['ID']
         thumb = item['thumbnailURL']
 
@@ -79,11 +80,11 @@ def MainMenu():
             showList[title] = {'id':id, 'index':showCount}
             showCount +=1
             dir.Append(Function(DirectoryItem(VideosPage, title), pid=network[0], id=id))
-                
+
     dir.Sort('title')
-    
+
     return dir
-    
+
 ####################################################################################################
 
 def VideoPlayer(sender, pid):
@@ -91,7 +92,7 @@ def VideoPlayer(sender, pid):
     videosmil = HTTP.Request(DIRECT_FEED % pid).content
     player = videosmil.split("ref src")
     player = player[2].split('"')
-    #Log(player)
+
     if ".mp4" in player[1]:
         player = player[1].replace(".mp4", "")
         try:
@@ -111,10 +112,8 @@ def VideoPlayer(sender, pid):
             player = player.split("/video/")[0]
             clip = "/video/" + clip[-1]
 
-    #Log(player)
-    #Log(clip)
     return Redirect(RTMPVideoItem(player, clip))
-    
+
 ####################################################################################################
 
 def VideosPage(sender, pid, id):
@@ -122,7 +121,6 @@ def VideosPage(sender, pid, id):
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="InfoList", art=sender.art)
     pageUrl = FEEDS_LIST % (pid, id)
     feeds = JSON.ObjectFromURL(pageUrl)
-    #Log(feeds)
 
     for item in feeds['items']:
         title = item['title']
@@ -133,30 +131,26 @@ def VideosPage(sender, pid, id):
         airdate = int(item['airdate'])/1000
         subtitle = 'Originally Aired: ' + datetime.datetime.fromtimestamp(airdate).strftime('%a %b %d, %Y')
         dir.Append(Function(VideoItem(VideoPlayer, title=title, subtitle=subtitle, summary=summary, thumb=thumb, duration=duration), pid=pid))
-    
+
     dir.Sort('title')
-    
+
     return dir
-    
+
 ####################################################################################################
 
 def SeasonsPage(sender, network):
+
     dir = MediaContainer(title2=sender.itemTitle, viewGroup="List", art=sender.art)
     content = JSON.ObjectFromURL(FEED_LIST % (network[0], network[1]))
-    #Log(sender.itemTitle)
-    #Log(content)
+
     for item in content['items']:
         if sender.itemTitle in item['fullTitle']:
             title = item['fullTitle']
-            #Log(title)
             title = title.split('/')[-1]
-            #if title == 'New This Week':
-            #    title = item['title']
             id = item['ID']
-            #thumb = item['thumbnailURL']
-            dir.Append(Function(DirectoryItem(VideosPage, title, thumb=sender.thumb), pid=network[0], id=id))
-    dir.Sort('title')
-    return dir
-            
-####################################################################################################
 
+            dir.Append(Function(DirectoryItem(VideosPage, title, thumb=sender.thumb), pid=network[0], id=id))
+
+    dir.Sort('title')
+
+    return dir
