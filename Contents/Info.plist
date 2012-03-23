@@ -16,6 +16,15 @@
 	<string>hook</string>
 	<key>CFBundleVersion</key>
 	<string>1.0</string>
+	<key>PlexClientCapabilities</key>
+	<dict>
+		<key>protocols</key>
+		<array>
+			<string>webkit</string>
+		</array>
+	</dict>
+	<key>PlexClientPlatformExclusions</key>
+	<string>Roku</string>
 	<key>PlexClientPlatforms</key>
 	<string>*</string>
 	<key>PlexFrameworkVersion</key>
@@ -30,12 +39,5 @@
 	<array>
 		<string>CA</string>
 	</array>
-	<key>PlexClientCapabilities</key>
-		<dict>
-			<key>protocols</key>
-			<array>
-				<string>webkit</string>
-			</array>
-		</dict>
 </dict>
 </plist>
