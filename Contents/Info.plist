@@ -3,24 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.plexapp.plugins.foodnetworkcanada</string>
-	<key>PlexClientCapabilities</key>
-	<dict>
-		<key>protocols</key>
-		<array>
-			<string>webkit</string>
-		</array>
-	</dict>
-	<key>PlexClientPlatformExclusions</key>
-	<string>Roku</string>
+	<string>com.plexapp.plugins.food_network_canada</string>
+	<key>PlexFrameworkFlags</key>
+	<array>
+		<string>UseRealRTMP</string>
+	</array>
 	<key>PlexClientPlatforms</key>
 	<string>*</string>
 	<key>PlexFrameworkVersion</key>
 	<string>2</string>
-	<key>PlexMediaContainer</key>
-	<array>
-		<string>Flash</string>
-	</array>
 	<key>PlexPluginRegions</key>
 	<array>
 		<string>CA</string>
